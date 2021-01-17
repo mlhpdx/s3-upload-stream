@@ -1,0 +1,41 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "An demo of `S3UploadStream` that creates a zip archive from of a set of files in S3, with the result being streamed back to S3.",
+  "Parameters" : {
+    "Bucket" : {
+      "Type" : "String",
+      "Description" : "Enter the name of the bucket to we used with this S3UploadStream example."
+    }
+  },
+  "Globals": {
+    "Function": {
+      "MemorySize": 1024,
+      "Runtime": "dotnetcore3.1",
+      "Timeout": 900,
+      "Environment": {
+        "Variables": {
+          "BUCKET_NAME": { "Ref" : "Bucket" }
+        }
+      }
+    }
+  },
+  "Resources": {
+    "Process": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Handler": "ZipS3ListToS3::ZipS3ListToS3.Functions::Process",
+        "CodeUri": "",
+        "Role": null,
+        "Policies": [
+          "AWSLambdaBasicExecutionRole",
+          {
+            "S3CrudPolicy": {
+              "BucketName": { "Ref" : "Bucket" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

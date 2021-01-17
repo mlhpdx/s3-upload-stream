@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Cppl.Utilities.AWS</RootNamespace>
+    <PackageId>S3UploadStream</PackageId>
+    <Authors>Lee Harding</Authors>
+    <Company>CircuitPeople</Company>
+    <Title>S3UploadStream Library</Title>
+    <PackageDescription>A `Stream` subclass that allows uploading dynamically generated (streaming, unknown size) content to AWS S3.</PackageDescription>
+    <PackageTags>stream;s3;aws;http-range;content-length;multi-part</PackageTags>
+    <RepositoryUrl>https://github.com/mlhpdx/s3-upload-stream</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.5.4" />
+  </ItemGroup>
+
+</Project>
