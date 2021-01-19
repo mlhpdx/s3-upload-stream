@@ -4,4 +4,4 @@ This code demonstrates how to perform uploads to S3 without holding the entire c
 
 This project is a follow-on to `SeekableS3Stream`, also on [Github](https://github.com/mlhpdx/seekable-s3-stream). Using both allows for very efficient and simple large file processing to and from S3 via AWS Lambda, as demonstrated in one of the [Examples](./Examples/Readme.md).
 
-For a more detailed explaination, check out the article on [Medium](https://medium.com/circuitpeople/streaming-uploads-for-amazon-s3-in-c-...).
+For a more detailed explaination, check out the article on [Medium](https://medium.com/circuitpeople/stream-to-stream-s3-uploads-with-aws-lambda-578fe710ac1e).
