@@ -107,6 +107,10 @@ namespace Cppl.Utilities.AWS
 
         private void Flush(bool disposing)
         {
+            if ((_metadata.CurrentStream == null || _metadata.CurrentStream.Length < MIN_PART_LENGTH) &&
+                !disposing)
+                return;
+
             if (_metadata.UploadId == null) {
                 _metadata.UploadId = _s3.InitiateMultipartUploadAsync(new InitiateMultipartUploadRequest()
                 {
@@ -114,9 +118,7 @@ namespace Cppl.Utilities.AWS
                     Key = _metadata.Key
                 }).GetAwaiter().GetResult().UploadId;
             }
-            // INFO: Don't complete the request here.  A flush just means send the buffer.  If it's
-            // less than MIN_PART_SIZE bytes and not the last part an exception will be thrown by 
-            // S3 but c'est la vie!  Maybe that should generate a warning.
+            
             if (_metadata.CurrentStream != null)
             {
                 var i = ++_metadata.PartCount;
