@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Cppl.Utilities.AWS</RootNamespace>
     <PackageId>S3UploadStream</PackageId>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <Authors>Lee Harding</Authors>
     <Company>CircuitPeople</Company>
     <Title>S3UploadStream Library</Title>
@@ -15,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.5.4" />
+    <None Include="../Readme.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>
