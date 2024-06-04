@@ -36,11 +36,11 @@ namespace DecryptPgpAndUpload
 
             context.Logger.LogLine($"{timer.Elapsed}: Getting started.");
             using var data = new SeekableS3Stream(s3, BUCKET, PGP_DATA, 5 * 1024 * 1024, 10);
-            using var key = new SeekableS3Stream(s3, BUCKET, PGP_PRIVATE_KEY, 32 * 1024);
+            var keys = new EncryptionKeys(new SeekableS3Stream(s3, BUCKET, PGP_PRIVATE_KEY, 32 * 1024), PGP_PASSWORD);
 
-            using var pgp = new PGP();
+            using var pgp = new PGP(keys);
             using (var output = new S3UploadStream(s3, BUCKET, OUTPUT_KEY)) {
-                await pgp.DecryptStreamAsync(data, output, key, PGP_PASSWORD);
+                await pgp.DecryptStreamAsync(data, output);
             }
 
             context.Logger.LogLine($"{timer.Elapsed}: Done copying.");
