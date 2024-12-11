@@ -17,11 +17,8 @@ namespace Cppl.Utilities.AWS
          * safe to assume all uploads will work here.  MAX_PART_SIZE times MAX_PART_COUNT
          * is ~50TB, which is too big for S3. */
         const long MIN_PART_LENGTH = 5L * 1024 * 1024; // all parts but the last this size or greater
-
         const long MAX_PART_LENGTH = 5L * 1024 * 1024 * 1024; // 5GB max per PUT
-
         const long MAX_PART_COUNT = 10000; // no more than 10,000 parts total
-
         const long DEFAULT_PART_LENGTH = MIN_PART_LENGTH;
 
         internal class Metadata
@@ -166,8 +163,6 @@ namespace Cppl.Utilities.AWS
             Flush(false);
         }
 
-        
-        
         private void Flush(bool disposing)
         {
             if ((_metadata.CurrentStream == null || _metadata.CurrentStream.Length < MIN_PART_LENGTH) &&
@@ -178,7 +173,9 @@ namespace Cppl.Utilities.AWS
 
             if (_metadata.UploadId == null)
             {
-                var response = _s3.InitiateMultipartUploadAsync(_metadata.InitiateMultipartUploadRequest, _metadata.CancellationToken).GetAwaiter().GetResult();
+                var response = _s3
+                    .InitiateMultipartUploadAsync(_metadata.InitiateMultipartUploadRequest, _metadata.CancellationToken)
+                    .GetAwaiter().GetResult();
                 _metadata.CancellationToken.ThrowIfCancellationRequested();
                 Initiated?.Invoke(response);
                 _metadata.UploadId = response.UploadId;
@@ -232,7 +229,6 @@ namespace Cppl.Utilities.AWS
             }
         }
 
-
         private void CompleteUpload()
         {
             Task.WaitAll(_metadata.Tasks.ToArray());
@@ -251,8 +247,6 @@ namespace Cppl.Utilities.AWS
                     }, _metadata.CancellationToken).GetAwaiter().GetResult();
                 Completed?.Invoke(response);
             }
-
-            
         }
 
         private void AbortUpload()
