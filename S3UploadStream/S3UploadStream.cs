@@ -46,7 +46,6 @@ namespace Cppl.Utilities.AWS
         public event Action<UploadPartResponse> UploadedPart;
         public event Action<StreamTransferProgressArgs> StreamTransfer;
         public event Action<CompleteMultipartUploadResponse> Completed;
-        public event Action<AbortMultipartUploadResponse> Aborted;
 
 
         public S3UploadStream(
@@ -107,16 +106,8 @@ namespace Cppl.Utilities.AWS
             {
                 if (_metadata != null)
                 {
-                    if (_metadata.CancellationToken.IsCancellationRequested &&
-                        !string.IsNullOrWhiteSpace(_metadata.UploadId))
-                    {
-                        AbortUpload();
-                    }
-                    else
-                    {
-                        Flush(true);
-                        CompleteUpload();
-                    }
+                    Flush(true);
+                    CompleteUpload();
                 }
             }
 
@@ -247,18 +238,6 @@ namespace Cppl.Utilities.AWS
                     }, _metadata.CancellationToken).GetAwaiter().GetResult();
                 Completed?.Invoke(response);
             }
-        }
-
-        private void AbortUpload()
-        {
-            var response = _s3.AbortMultipartUploadAsync(
-                new AbortMultipartUploadRequest
-                {
-                    BucketName = _metadata.InitiateMultipartUploadRequest.BucketName,
-                    Key = _metadata.InitiateMultipartUploadRequest.Key,
-                    UploadId = _metadata.UploadId,
-                }).GetAwaiter().GetResult();
-            Aborted?.Invoke(response);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
