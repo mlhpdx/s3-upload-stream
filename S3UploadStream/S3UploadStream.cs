@@ -51,20 +51,18 @@ namespace Cppl.Utilities.AWS
         public S3UploadStream(
             IAmazonS3 s3,
             string s3uri,
-            ChecksumAlgorithm checksumAlgorithm = null,
             long partLength = DEFAULT_PART_LENGTH,
-            CancellationToken cancellationToken = default)
-            : this(s3, new Uri(s3uri), checksumAlgorithm, partLength)
+            CancellationToken token = default)
+            : this(s3, new Uri(s3uri), partLength, token)
         {
         }
 
         public S3UploadStream(
             IAmazonS3 s3,
             Uri s3uri,
-            ChecksumAlgorithm checksumAlgorithm = null,
             long partLength = DEFAULT_PART_LENGTH,
-            CancellationToken cancellationToken = default)
-            : this(s3, s3uri.Host, s3uri.LocalPath.Substring(1), checksumAlgorithm, partLength)
+            CancellationToken token = default)
+            : this(s3, s3uri.Host, s3uri.LocalPath.Substring(1), partLength, token)
         {
         }
 
@@ -72,19 +70,17 @@ namespace Cppl.Utilities.AWS
             IAmazonS3 s3,
             string bucket,
             string key,
-            ChecksumAlgorithm checksumAlgorithm = null,
             long partLength = DEFAULT_PART_LENGTH,
-            CancellationToken cancellationToken = default)
+            CancellationToken token = default)
             : this(
                 s3,
                 new InitiateMultipartUploadRequest
                 {
                     BucketName = bucket,
-                    Key = key,
-                    ChecksumAlgorithm = checksumAlgorithm,
+                    Key = key
                 },
                 partLength,
-                cancellationToken)
+                token)
         {
         }
 
@@ -92,12 +88,12 @@ namespace Cppl.Utilities.AWS
             IAmazonS3 s3,
             InitiateMultipartUploadRequest initiateMultipartUploadRequest,
             long partLength = DEFAULT_PART_LENGTH,
-            CancellationToken cancellationToken = default)
+            CancellationToken token = default)
         {
             _s3 = s3;
             _metadata.PartLength = partLength;
             _metadata.InitiateMultipartUploadRequest = initiateMultipartUploadRequest;
-            _metadata.CancellationToken = cancellationToken;
+            _metadata.CancellationToken = token;
         }
 
         protected override void Dispose(bool disposing)
@@ -188,11 +184,7 @@ namespace Cppl.Utilities.AWS
                     ChecksumAlgorithm = _metadata.InitiateMultipartUploadRequest.ChecksumAlgorithm,
                 };
                 _metadata.CurrentStream = null;
-
-                if (StreamTransfer != null)
-                {
-                    request.StreamTransferProgress += (_, progressArgs) => { StreamTransfer.Invoke(progressArgs); };
-                }
+                request.StreamTransferProgress += (_, progressArgs) => { StreamTransfer?.Invoke(progressArgs); };
 
                 var upload = Task.Run(
                     async () =>
