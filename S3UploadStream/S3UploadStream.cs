@@ -258,7 +258,7 @@ namespace Cppl.Utilities.AWS
                 }
 
                 var remaining = _metadata.PartLength - _metadata.CurrentStream.Length;
-                var w = Math.Min(c, (int)remaining);
+                var w = (int)Math.Min(c, remaining);
                 _metadata.CurrentStream.Write(buffer, o, w);
 
                 _metadata.Position += w;
