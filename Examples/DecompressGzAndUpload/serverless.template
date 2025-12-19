@@ -11,7 +11,7 @@
   "Globals": {
     "Function": {
       "MemorySize": 512,
-      "Runtime": "dotnetcore3.1",
+      "Runtime": "dotnet8",
       "Timeout": 900,
       "Environment": {
         "Variables": {

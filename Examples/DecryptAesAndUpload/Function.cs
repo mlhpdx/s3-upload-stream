@@ -35,7 +35,7 @@ namespace DecryptAesAndUpload
             using var stream = (await s3.GetObjectAsync(BUCKET, AES_DATA)).ResponseStream;
 
             // setup a decryptor
-            using var aes = AesManaged.Create();
+            using var aes = Aes.Create();
             aes.IV = Convert.FromBase64String("EqYoED0ag4vlPnFkWZMCog==");
             aes.Key = Convert.FromBase64String("Sgf9NocncDHSBqMXrMthXbToAQmthMpC6eJ6Hw51Ghg=");
             
