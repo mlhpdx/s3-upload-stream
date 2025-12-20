@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Runtime;
+using System.Security.Cryptography;
 
 namespace Cppl.Utilities.AWS
 {
@@ -77,7 +78,8 @@ namespace Cppl.Utilities.AWS
                 new InitiateMultipartUploadRequest
                 {
                     BucketName = bucket,
-                    Key = key
+                    Key = key,
+                    ChecksumAlgorithm = ChecksumAlgorithm.CRC32
                 },
                 partLength,
                 token)
@@ -181,7 +183,7 @@ namespace Cppl.Utilities.AWS
                     PartNumber = i,
                     IsLastPart = disposing,
                     InputStream = _metadata.CurrentStream,
-                    ChecksumAlgorithm = _metadata.InitiateMultipartUploadRequest.ChecksumAlgorithm,
+                    ChecksumAlgorithm = _metadata.InitiateMultipartUploadRequest.ChecksumAlgorithm
                 };
                 _metadata.CurrentStream = null;
                 request.StreamTransferProgress += (_, progressArgs) => { StreamTransfer?.Invoke(progressArgs); };
@@ -198,12 +200,25 @@ namespace Cppl.Utilities.AWS
                         var partETag = new PartETag
                         {
                             PartNumber = response.PartNumber,
-                            ETag = response.ETag,
-                            ChecksumSHA1 = response.ChecksumSHA1,
-                            ChecksumSHA256 = response.ChecksumSHA256,
-                            ChecksumCRC32 = response.ChecksumCRC32,
-                            ChecksumCRC32C = response.ChecksumCRC32C,
+                            ETag = response.ETag
                         };
+
+                        if (request.ChecksumAlgorithm == ChecksumAlgorithm.CRC32 && response.ChecksumCRC32 != null)
+                        {
+                            partETag.ChecksumCRC32 = response.ChecksumCRC32;
+                        }
+                        else if (request.ChecksumAlgorithm == ChecksumAlgorithm.CRC32C && response.ChecksumCRC32C != null)
+                        {
+                            partETag.ChecksumCRC32C = response.ChecksumCRC32C;
+                        }
+                        else if (request.ChecksumAlgorithm == ChecksumAlgorithm.SHA1 && response.ChecksumSHA1 != null)
+                        {
+                            partETag.ChecksumSHA1 = response.ChecksumSHA1;
+                        }
+                        else if (request.ChecksumAlgorithm == ChecksumAlgorithm.SHA256 && response.ChecksumSHA256 != null)
+                        {
+                            partETag.ChecksumSHA256 = response.ChecksumSHA256;
+                        }
 
                         _metadata.PartETags.AddOrUpdate(i, partETag, (n, s) => partETag);
                         request.InputStream.Dispose();
